@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TV v118">
+    
+    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/192/television.png">
+    <link rel="manifest" href="manifest.json">
+
+    <title>Η Τηλεόρασή μου v118</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    
+    <style>
+        body { 
+            background: #000; color: #0f0; font-family: 'Arial Black', sans-serif; 
+            text-align: center; margin: 0; overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .buttons { 
+            display: flex; flex-wrap: wrap; justify-content: center; 
+            gap: 4px; padding: 10px;
+            max-height: 38vh; overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        button { 
+            padding: 12px 2px; font-size: 10px; width: 18%; 
+            background: #111; color: #0f0; border: 2px solid #0f0; 
+            cursor: pointer; border-radius: 6px; font-weight: bold;
+            text-transform: uppercase;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:active { background: #0f0; color: #000; }
+        
+        .btn-gold { color: #ffd700; border-color: #ffd700; }
+        .btn-mega { color: #ff00ff; border-color: #ff00ff; }
+        .btn-ert { color: #0054a6; border-color: #0054a6; background: #fff; }
+        .btn-action { color: #fff; border-color: #ff0000; background: #000; }
+        .btn-local { color: #00ffff; border-color: #00ffff; }
+        
+        #container { width: 100vw; height: 50vh; background: #000; position: relative; }
+        video, iframe { width: 100%; height: 100%; background: #000; border: none; }
+        #status { font-size: 16px; color: #ffd700; padding: 8px; font-weight: bold; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="buttons">
+        <button class="btn-ert" onclick="playDASH('https://ertflix.ascdn.broadpeak.io/ertlive/ert1/clrdef24723b/index.mpd', 'ΕΡΤ 1')">ΕΡΤ 1</button>
+        <button class="btn-ert" onclick="playHLS('https://ertflix-greece.siliconweb.com/mpegts/618618_2341557/master_mpegts.m3u8', 'ERT SPORTS')">ERT SP</button>
+        <button class="btn-ert" onclick="playHLS('https://ertflix-greece.siliconweb.com/mpegts/618618_2341560/master_mpegts.m3u8', 'ΕΡΤ 3')">ΕΡΤ 3</button>
+        <button class="btn-gold" onclick="playHLS('https://lcdn.antennaplus.gr/r86d08d448885424196f6cd3ddc5d1489/eu-central-1/6415884360001/playlist_dvr.m3u8', 'ANTENNA')">ANTENNA</button>
+        <button class="btn-mega" onclick="playIframe('https://player.vindral.com/?core.channelId=alteregomedia_megatv1_ci_6cc490c7-e5c6-486b-acf0-9bb9c20fa670&core.minBufferTime=2000&player.aspectRatio=16:9', 'MEGA')">MEGA</button>
+        <button onclick="playHLS('https://livestar.siliconweb.com/media/star4/star4.m3u8', 'STAR')">STAR</button>
+        <button onclick="playHLS('https://alphatvlive2.siliconweb.com/alphatvlive/live_abr/playlist.m3u8', 'ALPHA')">ALPHA</button>
+        <button class="btn-gold" onclick="playHLS('https://liveopen.siliconweb.com/openTvLive/liveopen/playlist.m3u8', 'OPEN')">OPEN</button>
+        <button class="btn-gold" onclick="playHLS('https://skai-live-back.siliconweb.com/media/cambria4/index.m3u8', 'ΣΚΑΪ')">ΣΚΑΪ</button>
+        <button class="btn-action" onclick="playHLS('https://actionlive.siliconweb.com/actionabr/actiontv/playlist.m3u8', 'ACTION 24')">ACTION 24</button>
+        <button class="btn-gold" onclick="playHLS('https://lcdn.antennaplus.gr/r444865966c0847fca53b9b0c133af7a9/eu-central-1/6415884360001/playlist_dvr.m3u8', 'MAK TV')">MAK TV</button>
+        <button class="btn-local" onclick="playHLS('https://cdn.onestreaming.com/thrakinettv/thrakinettv/playlist.m3u8', 'THRAKI NET')">THRAKI</button>
+        <button class="btn-local" onclick="playHLS('https://ch01.onstream.gr/neatv/neatv/playlist.m3u8', 'NEA TV')">NEA TV</button>
+        <button class="btn-local" onclick="playHLS('https://acheloostv.streamings.gr/live/stream/index.m3u8', 'ACHELOOS TV')">ACHELOOS</button>
+        <button class="btn-local" onclick="playHLS('https://telmaco-cdn.akamaized.net/starcgr/default/index.m3u8', 'STAR K.E.')">STAR K.E.</button>
+        <button class="btn-local" onclick="playHLS('https://live20.bozztv.com/akamaissh101/ssh101/eurotvlive/playlist.m3u8', 'EURO TV')">EURO TV</button>
+        <button class="btn-local" onclick="playHLS('https://livetv.streams.ovh:8081/kriti/index.m3u8', 'KRITI 1')">KRITI 1</button>
+        <button class="btn-local" onclick="playHLS('https://server.gointernet.gr/live/livestream.m3u8', 'ASTRA TV')">ASTRA TV</button>
+        <button class="btn-local" onclick="playHLS('https://verginanews.gr:8443/hls_live/stream1.m3u8', 'VERGINA TV')">VERGINA</button>
+        <button class="btn-local" onclick="playIframe('https://www.youtube.com/embed/live_stream?channel=UCBUJYmYHEFatl5hwi6biAWQ', 'CRETE TV')">CRETE TV</button>
+        <button class="btn-gold" onclick="playHLS('https://kontralive.siliconweb.com/live/kontratv/playlist.m3u8', 'KONTRA')">KONTRA</button>
+        <button class="btn-gold" onclick="playHLS('https://itv.streams.ovh/ALEERT/ALEERT/playlist.m3u8', 'ALERT TV')">ALERT</button>
+        <button class="btn-gold" onclick="playHLS('https://cdn5.smart-tv-data.com/bluesky/bluesky-live/playlist.m3u8', 'BLUE SKY')">BLUE SKY</button>
+        <button class="btn-gold" onclick="playHLS('https://ertflix.ascdn.broadpeak.io/ertlive/vouli/default/index.m3u8', 'ΒΟΥΛΗ')">ΒΟΥΛΗ</button>
+        <button class="btn-gold" onclick="playHLS('https://gr-live.itv.streams.ovh/MADTV/MADTV/playlist.m3u8', 'MAD TV')">MAD TV</button>
+        <button class="btn-gold" onclick="playHLS('https://rumble.com/live-hls/v6cc6tg/playlist.m3u8', 'ART TV')">ART TV</button>
+        <button class="btn-gold" onclick="playHLS('https://live.magictv.gr/magictv/magictv/playlist.m3u8', 'MAGIC TV')">MAGIC</button>
+    </div>
+
+    <div id="status" role="alert">ΕΤΟΙΜΟ v118</div>
+
+    <div id="container">
+        <video id="videoPlayer" controls autoplay playsinline></video>
+        <iframe id="iframePlayer" class="hidden" allow="autoplay; encrypted-media; fullscreen"></iframe>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const iframePlayer = document.getElementById('iframePlayer');
+        const status = document.getElementById('status');
+        let hls = null;
+        let dashPlayer = null;
+
+        function reset() {
+            if(hls) { hls.destroy(); hls = null; }
+            if(dashPlayer) { dashPlayer.reset(); dashPlayer = null; }
+            video.pause(); 
+            video.src = "";
+            video.classList.remove('hidden');
+            iframePlayer.classList.add('hidden');
+            iframePlayer.src = "";
+        }
+
+        function playIframe(url, name) {
+            reset();
+            video.classList.add('hidden');
+            iframePlayer.classList.remove('hidden');
+            iframePlayer.src = url;
+            status.innerText = "ΠΑΙΖΕΙ: " + name;
+        }
+
+        function playHLS(url, name) {
+            reset();
+            status.innerText = "ΦΟΡΤΩΣΗ: " + name;
+            if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+                status.innerText = "ΠΑΙΖΕΙ: " + name;
+            } else if (Hls.isSupported()) {
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => { 
+                    video.play(); 
+                    status.innerText = "ΠΑΙΖΕΙ: " + name;
+                });
+            }
+        }
+
+        function playDASH(url, name) {
+            reset();
+            status.innerText = "ΦΟΡΤΩΣΗ: " + name;
+            dashPlayer = dashjs.MediaPlayer().create();
+            dashPlayer.initialize(video, url, true);
+            status.innerText = "ΠΑΙΖΕΙ: " + name;
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
